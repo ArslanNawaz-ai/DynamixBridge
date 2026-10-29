@@ -1,1 +1,1 @@
-# DynaixBridge
+# DynamixBridge
