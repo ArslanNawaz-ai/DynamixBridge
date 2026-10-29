@@ -1,0 +1,778 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dynamix Bridge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@300;400;600;700&display=swap">
+<style>
+/* Layout: teal utility bar → white header with 3-column cascading mega menus (family → product → "in action") → dark teal-black hero → light sections with teal accents → dark contact band → dark footer.
+   Palette from the logo, teal-led: navy kept for the logo only. */
+:root{
+  --teal:#0BA89F; --teal-600:#078A82; --teal-700:#056B65; --teal-400:#2BC4B9; --teal-100:#D7F2EF; --teal-50:#EEF8F7;
+  --navy:#0E2160;
+  --ink:#121C2B; --text:#3D4655; --muted:#6B7380; --line:#E1E5E8; --bg:#FFFFFF; --bg-soft:#F5F7F7;
+  --dark:#0A1716; --dark-2:#0F2422; --on-dark:#E8F2F1; --on-dark-muted:#9DB3B0; --line-dark:rgba(255,255,255,.12);
+  --menu-l:#EEF8F7; --menu-m:#EEF0F0; --menu-r:#F6F7F7; --menu-line:#D9DDDE;
+  --f-display:"Sora","Segoe UI",system-ui,sans-serif;
+  --f-body:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
+  --wrap:1260px; color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:80;background:#fff}
+h1,h2,h3,h4{font-family:var(--f-display);color:var(--ink);margin:0;line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:760px){.wrap{padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px))}}
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 15px/1 var(--f-body);padding:15px 22px;border-radius:8px;text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:background .2s,transform .2s,border-color .2s,color .2s;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 10px 24px -12px rgba(11,168,159,.8)}
+.btn-teal:hover{background:var(--teal-600);transform:translateY(-2px)}
+.btn-dark{background:var(--teal-700);color:#fff}
+.btn-dark:hover{background:var(--teal-600)}
+.btn-line{border-color:var(--teal);color:var(--teal-700);background:#fff}
+.btn-line:hover{background:var(--teal-50)}
+.btn-line-light{border-color:rgba(255,255,255,.3);color:#fff}
+.btn-line-light:hover{border-color:var(--teal-400);color:var(--teal-400)}
+.kicker{font:700 12.5px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--teal-600);display:inline-flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:28px;height:2px;background:currentColor}
+.kicker.light{color:var(--teal-400)}
+
+/* ---------- Logo ---------- */
+.logo{display:block;width:auto}
+.logo .w1,.logo .tag,.logo .mk-d{fill:var(--navy)} .logo .w2{fill:var(--teal)}
+.logo-light .w1,.logo-light .tag,.logo-light .mk-d{fill:#fff}
+.mk-t{stroke:var(--teal);fill:none} .mk-tf{fill:var(--teal)}
+
+/* ---------- Product icon slot ---------- */
+.pi{flex:none;width:40px;height:40px;display:grid;place-items:center}
+.pi img{width:100%;height:100%;object-fit:contain}
+.pi .mono{width:100%;height:100%;border-radius:10px;display:grid;place-items:center;font:700 13px/1 var(--f-display);color:#fff;background:linear-gradient(140deg,var(--teal-400) 0%,var(--teal-600) 60%,var(--teal-700) 100%);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.pi .mono.alt{background:linear-gradient(140deg,#5FD8CE 0%,var(--teal) 100%)}
+.pi .mono.svc{background:#fff;border:1.5px solid var(--teal-100);color:var(--teal-600);box-shadow:none}
+.pi .mono.svc svg{width:20px;height:20px}
+
+/* ---------- Utility bar ---------- */
+.util{background:#fff;position:relative;z-index:61}
+.util-in{display:flex;align-items:stretch;justify-content:space-between;gap:16px}
+.util-strip{position:relative;display:flex;align-items:center;gap:24px;padding:9px 48px 9px 0;color:#fff;font-size:13.5px;font-weight:600;isolation:isolate}
+.util-strip::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;right:0;left:-100vw;background:linear-gradient(90deg,var(--teal-700),var(--teal));clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%)}
+.util-strip::after{content:"";position:absolute;z-index:-2;top:0;bottom:0;right:-12px;width:30px;background:var(--teal-400);clip-path:polygon(60% 0,100% 0,40% 100%,0 100%)}
+.util-strip span{display:inline-flex;align-items:center;gap:8px}
+.util-strip svg{width:15px;height:15px}
+.util-right{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+.util-right a{color:var(--teal-600);font-weight:700;text-decoration:none}
+@media (max-width:860px){.util-right{display:none}.util-strip span+span{display:none}}
+
+/* ---------- Header ---------- */
+.header{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:#fff;border-bottom:1px solid var(--line);transition:box-shadow .2s}
+.header.scrolled{box-shadow:0 8px 30px -18px rgba(10,23,22,.45)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:24px;height:84px}
+.brand{flex:none;text-decoration:none}
+.brand .logo{height:50px}
+.nav{display:flex;align-items:center;gap:2px;height:100%}
+.nav>.ni{height:100%;display:flex;align-items:center}
+.nt{position:relative;display:flex;align-items:center;gap:6px;height:100%;background:none;border:0;padding:0 16px;font:600 16px var(--f-body);color:#3E4450;cursor:pointer;text-decoration:none;white-space:nowrap;transition:color .2s}
+.nt::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--teal);transform:scaleX(0);transition:transform .2s}
+.ni:hover>.nt,.ni.open>.nt{color:var(--teal-600)}
+.ni:hover>.nt::after,.ni.open>.nt::after{transform:scaleX(1)}
+.bar-cta{display:flex;align-items:center;gap:10px}
+.burger{display:none;width:46px;height:46px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);align-items:center;justify-content:center;cursor:pointer}
+
+/* ---------- Mega menu (families | products | in action) ---------- */
+.mega{position:absolute;left:0;right:0;top:100%;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility 0s .18s;pointer-events:none}
+.ni:hover>.mega,.ni.open>.mega{visibility:visible;opacity:1;transform:none;transition:opacity .18s,transform .18s;pointer-events:auto}
+.ni.shut>.mega{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+.mega-box{display:grid;grid-template-columns:275px minmax(0,455px) minmax(0,1fr);height:500px;border-top:3px solid var(--teal);background:var(--menu-r);box-shadow:0 30px 60px -25px rgba(10,23,22,.5)}
+.fam{background:var(--menu-l);border-right:1px solid var(--menu-line);overflow-y:auto}
+.fam button{display:flex;align-items:center;gap:18px;width:100%;min-height:86px;padding:0 20px;background:none;border:0;border-bottom:1px solid var(--menu-line);font:600 16.5px var(--f-body);color:var(--ink);text-align:left;cursor:pointer;transition:background .15s,color .15s}
+.fam button .tri{margin-left:auto;width:0;height:0;border-left:7px solid var(--teal);border-top:6px solid transparent;border-bottom:6px solid transparent;opacity:0}
+.fam button[aria-selected="true"]{background:#fff;color:var(--teal-600)}
+.fam button[aria-selected="true"] .tri{opacity:1}
+.prod{background:var(--menu-m);border-right:1px solid var(--menu-line);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#9AA3A5 transparent}
+.prod .grp{padding:12px 22px 8px;font:700 11.5px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--menu-m);border-bottom:1px solid var(--menu-line);position:sticky;top:0;z-index:1}
+.prod a{display:flex;align-items:center;gap:18px;padding:16px 22px;min-height:86px;border-bottom:1px solid var(--menu-line);text-decoration:none;transition:background .15s}
+.prod a .txt{flex:1;min-width:0}
+.prod a strong{display:block;font:600 16.5px/1.3 var(--f-body);color:var(--ink)}
+.prod a span.d{display:block;font-size:14px;line-height:1.4;color:#4A505B;margin-top:3px}
+.prod a .tri{flex:none;width:0;height:0;border-left:7px solid var(--teal);border-top:6px solid transparent;border-bottom:6px solid transparent;opacity:0}
+.prod a.on{background:#fff}
+.prod a.on strong{color:var(--teal-600)}
+.prod a.on .tri{opacity:1}
+.act{padding:30px 30px 24px;overflow-y:auto;min-width:0}
+.act h4{display:inline-block;font:600 21px/1.3 var(--f-body);color:var(--ink);padding-bottom:4px;border-bottom:2.5px solid var(--teal);margin-bottom:18px;letter-spacing:-.01em}
+.act h4+.arts{margin-bottom:30px}
+.arts{display:flex;flex-direction:column}
+.arts a{display:block;text-decoration:none;padding:14px 0;border-bottom:1.5px solid #2B3038}
+.arts a:first-child{padding-top:0}
+.arts a:last-child{border-bottom:0}
+.arts strong{display:block;font:600 16px/1.35 var(--f-body);color:var(--ink)}
+.arts span{display:block;font-size:14px;line-height:1.45;color:#4A505B;margin-top:4px}
+.arts a:hover strong{color:var(--teal-600)}
+@media (max-width:1200px){.mega-box{grid-template-columns:240px minmax(0,1fr) 300px}.nt{padding:0 11px;font-size:15px}}
+@media (max-width:1060px){
+  .burger{display:inline-flex}
+  .bar-cta .btn{display:none}
+  .nav{position:fixed;left:0;right:0;bottom:0;top:84px;background:#fff;flex-direction:column;align-items:stretch;gap:0;height:auto;overflow-y:auto;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:none;border-top:1px solid var(--line)}
+  .nav.show{display:flex}
+  .nav>.ni{height:auto;flex-direction:column;align-items:stretch;border-bottom:1px solid var(--line)}
+  .nt{height:auto;padding:18px 2px;justify-content:space-between;font-size:17px}
+  .nt::after{display:none}
+  .mega,.ni:hover>.mega{position:static;visibility:visible;opacity:1;transform:none;pointer-events:auto;display:none;transition:none}
+  .ni.open>.mega{display:block}
+  .mega-box{display:block;height:auto;border:0;box-shadow:none;background:none}
+  .fam,.prod,.act{display:none}
+  .mob{display:block!important;padding-bottom:14px}
+  .nav .m-cta{display:flex!important;justify-content:center;margin-top:22px}
+}
+.mob,.nav .m-cta{display:none}
+.mob details{border-left:2px solid var(--line);margin:6px 0 6px 2px}
+.mob summary{list-style:none;cursor:pointer;padding:10px 14px;font:700 15px var(--f-body);color:var(--ink);display:flex;align-items:center;gap:12px}
+.mob summary .pi{width:30px;height:30px}
+.mob summary::-webkit-details-marker{display:none}
+.mob summary::after{content:"+";margin-left:auto;color:var(--teal);font-size:20px;font-weight:500}
+.mob details[open]{border-left-color:var(--teal)}
+.mob details[open] summary::after{content:"\2013"}
+.mob ul{list-style:none;margin:0 0 8px;padding:0 14px;display:grid;gap:2px}
+.mob li a{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14.5px;color:var(--text);text-decoration:none}
+.mob li .pi{width:24px;height:24px}
+.mob li .pi .mono{font-size:9px;border-radius:6px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;background:radial-gradient(70% 100% at 92% 100%,#CDEFEB 0%,#EEF9F8 45%,#FFFFFF 85%),#fff;color:var(--text);overflow:hidden;isolation:isolate;border-bottom:1px solid var(--line)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(255,255,255,.96) 0%,rgba(255,255,255,.65) 45%,rgba(255,255,255,0) 75%)}
+.hero-in{padding-block:100px 70px;display:flex;flex-direction:column;gap:26px}
+.hero-in>*{max-width:780px}
+.hero h1{color:var(--ink);font-weight:300;font-size:clamp(42px,6.2vw,80px);line-height:1.03;letter-spacing:-.04em}
+.hero h1 b{font-weight:700;color:var(--teal)}
+.hero .sub{font:700 clamp(17px,1.6vw,20px)/1.45 var(--f-body);color:var(--ink)}
+.hero .lead{font-size:16.5px;color:var(--muted);max-width:40em}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.hero-foot{border-top:1px solid var(--line);background:rgba(255,255,255,.75);backdrop-filter:blur(6px)}
+.hero-foot-in{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:22px;flex-wrap:wrap}
+.hero-foot p{font-size:14px;color:var(--muted);max-width:20em}
+.stack{display:flex;flex-wrap:wrap;gap:10px}
+.tile{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;font:600 13px var(--f-body);color:var(--ink)}
+.tile .pi{width:28px;height:28px}
+.tile .pi .mono{font-size:10px;border-radius:7px}
+
+/* ---------- Trust ---------- */
+.trust{position:relative;padding-block:110px 100px;overflow:hidden;background:#fff}
+.trust .ghost{position:absolute;left:-120px;top:40px;width:560px;height:auto;opacity:.06;pointer-events:none}
+.trust .ghost .mk-d{fill:var(--teal-700)}
+.trust-grid{position:relative;display:grid;grid-template-columns:1fr 1.25fr;gap:48px 72px;align-items:end}
+.trust h2{font-weight:300;font-size:clamp(34px,4.6vw,60px);line-height:1.05;letter-spacing:-.035em}
+.trust h2 b{font-weight:700;color:var(--teal)}
+.trust-copy{display:flex;flex-direction:column;gap:18px;font-size:17px}
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);margin-top:24px;border-top:1px solid var(--line)}
+.stat{display:flex;gap:16px;align-items:flex-start;padding:28px 24px 0 0}
+.stat+.stat{padding-left:24px;border-left:1px solid var(--line)}
+.stat .si{flex:none;width:48px;height:48px;border-radius:12px;background:var(--teal-50);border:1px solid var(--teal-100);color:var(--teal-600);display:grid;place-items:center}
+.stat .si svg{width:24px;height:24px}
+.stat b{display:block;font:700 30px/1 var(--f-display);color:var(--ink);margin-bottom:6px}
+.stat span{font-size:14px;color:var(--muted);line-height:1.4;display:block}
+@media (max-width:960px){.trust-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:0;padding-left:0}}
+@media (max-width:520px){.stats{grid-template-columns:1fr}.stat+.stat{border-left:0;padding-left:0}.trust{padding-block:72px}}
+
+/* ---------- Services (light, tabbed) ---------- */
+.svc{position:relative;background:var(--bg-soft);padding-block:100px 104px;overflow:hidden;isolation:isolate;border-block:1px solid var(--line)}
+.giant{position:absolute;z-index:-1;left:50%;top:40px;transform:translateX(-50%);font:300 clamp(70px,13vw,190px)/1 var(--f-display);letter-spacing:-.04em;white-space:nowrap;color:transparent;-webkit-text-stroke:1.2px rgba(11,168,159,.22);pointer-events:none;user-select:none}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px 56px;flex-wrap:wrap;margin-bottom:44px}
+.sec-head h2{font-size:clamp(32px,4vw,50px);font-weight:300;letter-spacing:-.035em;margin-top:16px}
+.sec-head h2 b{font-weight:700}
+.sec-head p{max-width:32em;color:var(--muted);font-size:16.5px}
+.svc .sec-head{padding-top:70px}
+.svc-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 30px 60px -40px rgba(10,23,22,.35)}
+.stabs{display:flex;gap:4px;flex-wrap:wrap;padding:6px;background:var(--bg-soft);border-radius:12px}
+.stab{display:flex;align-items:center;gap:10px;background:none;border:0;border-radius:9px;padding:9px 16px 9px 9px;font:600 14.5px var(--f-body);color:var(--text);cursor:pointer;transition:background .2s,color .2s}
+.stab .pi{width:28px;height:28px}
+.stab .pi .mono{font-size:10px;border-radius:7px}
+.stab:hover{color:var(--ink)}
+.stab[aria-selected="true"]{background:#fff;color:var(--teal-600);box-shadow:0 4px 14px -6px rgba(10,23,22,.25)}
+.spanel{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;padding:34px 24px 24px}
+.spanel-l{display:flex;flex-direction:column;gap:20px;min-width:0}
+.spanel-l h3{font-size:28px;font-weight:600}
+.spanel-l>p{color:var(--muted)}
+.acc{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.acc details{border-bottom:1px solid var(--line)}
+.acc details:last-child{border-bottom:0}
+.acc summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;font:600 15px var(--f-body);color:var(--ink)}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary .pm{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--teal);color:var(--teal);display:grid;place-items:center;transition:transform .25s,background .2s}
+.acc summary .pm svg{width:10px;height:10px}
+.acc details[open]{background:var(--teal-50)}
+.acc details[open] summary .pm{transform:rotate(45deg);background:var(--teal);color:#fff}
+.acc details p{padding:0 18px 18px;font-size:14.5px;color:var(--text)}
+.spanel-r{border-radius:14px;background:var(--bg-soft);padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.spanel-r h4{font:700 12px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--teal-600)}
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.app{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px;transition:border-color .2s,transform .2s}
+.app:hover{border-color:var(--teal);transform:translateY(-2px)}
+.app .pi{width:34px;height:34px}
+.app .pi .mono{font-size:11px;border-radius:8px}
+.app strong{display:block;font-size:14.5px;color:var(--ink);line-height:1.3}
+.app span{display:block;font-size:12.5px;color:var(--muted);line-height:1.4;margin-top:3px}
+@media (max-width:960px){.spanel{grid-template-columns:1fr;padding:26px 8px 8px}}
+@media (max-width:560px){.apps{grid-template-columns:1fr}.stab{padding:8px 12px 8px 8px;font-size:13.5px}.svc{padding-block:72px}}
+
+/* ---------- Engineering ---------- */
+.eng{padding-block:104px}
+.eng-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.ecard{border-radius:18px;overflow:hidden;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s}
+.ecard:hover{transform:translateY(-4px);box-shadow:0 30px 50px -30px rgba(10,23,22,.4)}
+.ecard .vis{position:relative;height:220px;background:var(--teal-50);overflow:hidden;border-bottom:1px solid var(--line)}
+.ecard .vis svg{position:absolute;inset:0;width:100%;height:100%}
+.ecard .body{padding:26px;display:flex;flex-direction:column;gap:12px;flex:1}
+.ecard h3{font-size:22px;font-weight:600}
+.ecard p{color:var(--muted);font-size:14.5px}
+.ecard ul{list-style:none;margin:auto 0 0;padding:14px 0 0;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line)}
+.ecard li{font:600 12px var(--f-body);padding:6px 10px;border-radius:6px;background:var(--teal-50);color:var(--teal-700)}
+@media (max-width:980px){.eng-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.eng-grid{grid-template-columns:1fr}.eng{padding-block:72px}}
+
+/* ---------- Engagement ---------- */
+.engage{background:var(--bg-soft);padding-block:104px;border-top:1px solid var(--line)}
+.models{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.model{background:#fff;border:1px solid var(--line);border-radius:18px;padding:34px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden;min-width:0;isolation:isolate}
+.model::after{content:"";position:absolute;z-index:-1;right:-70px;top:-70px;width:170px;height:170px;border-radius:50%;border:26px solid var(--teal-50)}
+.model .mi{width:54px;height:54px;border-radius:14px;background:var(--teal);color:#fff;display:grid;place-items:center}
+.model .mi svg{width:26px;height:26px}
+.model h3{font-size:26px;font-weight:600}
+.model>p{color:var(--muted)}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;font-size:14.5px;color:var(--ink);font-weight:500}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks svg{flex:none;width:18px;height:18px;margin-top:3px;color:var(--teal)}
+.model .btn{align-self:flex-start;margin-top:auto}
+@media (max-width:900px){.models{grid-template-columns:1fr}}
+@media (max-width:520px){.checks{grid-template-columns:1fr}.model{padding:24px}.engage{padding-block:72px}}
+
+/* ---------- Process ---------- */
+.process{padding-block:104px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.step{position:relative;padding:28px 24px;border-radius:16px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,box-shadow .2s}
+.step:hover{border-color:var(--teal);box-shadow:0 20px 40px -26px rgba(10,23,22,.4)}
+.step .n{font:300 46px/1 var(--f-display);color:transparent;-webkit-text-stroke:1.2px var(--teal)}
+.step h3{font-size:20px;font-weight:600}
+.step p{font-size:14.5px;color:var(--muted)}
+.step:not(:last-child)::after{content:"";position:absolute;top:50px;right:-23px;width:24px;height:2px;background:var(--teal)}
+@media (max-width:980px){.steps{grid-template-columns:1fr 1fr}.step::after{display:none}}
+@media (max-width:560px){.steps{grid-template-columns:1fr}.process{padding-block:72px}}
+
+/* ---------- Contact ---------- */
+.contact{padding-block:0 104px}
+.cband{position:relative;border-radius:24px;overflow:hidden;background:linear-gradient(120deg,#F3FBFA 0%,#E2F5F3 55%,#C9EEE9 110%);border:1px solid var(--teal-100);color:var(--text);display:grid;grid-template-columns:1fr 1.1fr;gap:48px;padding:56px;isolation:isolate}
+.cband svg.art{position:absolute;left:-10%;bottom:-20%;width:80%;height:auto;z-index:-1;opacity:.35}
+.c-copy{display:flex;flex-direction:column;gap:18px}
+.c-copy h2{color:var(--ink);font-size:clamp(34px,4.4vw,56px);font-weight:300;letter-spacing:-.035em}
+.c-copy h2 b{font-weight:700;color:var(--teal)}
+.c-copy p{color:var(--muted);font-size:16.5px}
+.c-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:12px}
+.c-list li{display:flex;gap:12px;align-items:center;font-weight:600;color:var(--ink);font-size:15px}
+.c-list i{width:30px;height:30px;border-radius:50%;background:var(--teal);display:grid;place-items:center;color:#fff}
+.c-list svg{width:15px;height:15px}
+form{background:#fff;border:1px solid var(--teal-100);box-shadow:0 24px 50px -30px rgba(7,138,130,.45);border-radius:16px;padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px;color:var(--text)}
+form h3{grid-column:1/-1;font-size:20px;font-weight:600}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f.full{grid-column:1/-1}
+label{font:600 13px var(--f-body);color:var(--ink)}
+input,select,textarea{font:400 15px var(--f-body);color:var(--text);background:var(--bg-soft);border:1px solid var(--line);border-radius:9px;padding:12px 13px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-100)}
+textarea{min-height:110px;resize:vertical}
+.f-foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.f-foot small{color:var(--muted);font-size:12.5px}
+.err{color:#C0392B;font-size:12.5px}
+.f-msg{grid-column:1/-1;padding:13px 15px;border-radius:10px;background:var(--teal-50);border:1px solid var(--teal-100);color:var(--ink);font-size:14.5px}
+@media (max-width:960px){.cband{grid-template-columns:1fr;padding:36px 24px}}
+@media (max-width:560px){form{grid-template-columns:1fr;padding:20px}.cband{padding:28px 16px;border-radius:18px}.contact{padding-bottom:72px}}
+
+/* ---------- Footer ---------- */
+footer{background:var(--bg-soft);color:var(--muted);padding-block:72px 32px;position:relative;border-top:1px solid var(--line)}
+footer::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--teal)}
+.fgrid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:36px}
+.fbrand{display:flex;flex-direction:column;gap:18px}
+.fbrand .logo{height:58px}
+.fbrand p{font-size:14px;max-width:26em}
+footer h5{margin:0 0 14px;font:700 12px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-size:14px}
+footer ul a{text-decoration:none}
+footer ul a:hover{color:var(--teal-600)}
+.fbase{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
+@media (max-width:960px){.fgrid{grid-template-columns:1fr 1fr}.fbrand{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+
+<!-- Logo mark (SVG recreation of the Dynamix Bridge logo) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <mask id="arcGap" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="84">
+      <rect width="120" height="84" fill="#fff"/>
+      <path d="M24 57 C 40 38, 56 31.5, 72 31.5 C 88 31.5, 100 38, 113 49" stroke="#000" stroke-width="10" fill="none"/>
+    </mask>
+    <symbol id="db-mark" viewBox="0 0 114 82">
+      <path class="mk-d" fill-rule="evenodd" mask="url(#arcGap)" d="M34 3.4 H73 C95 3.4 109.6 20 109.6 41.5 C109.6 63 95 79.4 75 79.4 H34 Z M45 14.2 H73 C88 14.2 98.6 26 98.6 41.5 C98.6 57 88 68.6 75 68.6 H45 Z"/>
+      <path class="mk-t" stroke-width="3.6" d="M13.5 59 L26 56.4 C 40 39, 56 32.5, 72 32.5 C 87 32.5, 99 38.5, 110 48"/>
+      <rect class="mk-tf" x="63.5" y="33" width="3.4" height="36"/>
+      <rect class="mk-tf" x="73" y="33" width="3.4" height="36"/>
+      <path class="mk-t" stroke-width="3.4" d="M17.6 18 H34 M14.6 38 H34"/>
+      <circle class="mk-t" cx="13" cy="18" r="4.4" stroke-width="3"/>
+      <circle class="mk-t" cx="10" cy="38" r="4.4" stroke-width="3"/>
+      <circle class="mk-t" cx="13" cy="59.5" r="4.4" stroke-width="3"/>
+    </symbol>
+    <linearGradient id="rib" x1="0" x2="1"><stop offset="0" stop-color="#2BC4B9"/><stop offset="1" stop-color="#056B65"/></linearGradient>
+  </defs>
+</svg>
+
+<div class="util">
+  <div class="wrap util-in">
+    <div class="util-strip">
+      <span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2.2 2 3.3 4.4 3.3 7S12.2 15 10 17M10 3C7.8 5 6.7 7.4 6.7 10S7.8 15 10 17"/></svg>Microsoft business applications &amp; cloud</span>
+      <span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 1.5"/></svg>24/7 managed support</span>
+    </div>
+    <div class="util-right">Free Dynamics 365 health check · <a href="#contact">Book now</a></div>
+  </div>
+</div>
+
+<header class="header" id="hdr">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="Dynamix Bridge home">
+      <svg class="logo" viewBox="0 0 470 84" role="img" aria-label="Dynamix Bridge">
+        <use href="#db-mark" width="114" height="82"/>
+        <text x="128" y="47" font-family="Sora,'Segoe UI',sans-serif" font-weight="600" font-size="44" textLength="338" lengthAdjust="spacingAndGlyphs"><tspan class="w1">Dynamix</tspan><tspan class="w2" dx="10">Bridge</tspan></text>
+        <text class="tag" x="129" y="75" font-family="'Plus Jakarta Sans','Segoe UI',sans-serif" font-weight="500" font-size="18" textLength="300" lengthAdjust="spacingAndGlyphs">The bridge to smarter business.</text>
+      </svg>
+    </a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <div class="ni"><a class="nt" href="#top">Home</a></div>
+      <div class="ni" data-mega="svc"><button class="nt" aria-expanded="false">Offerings</button><div class="mega"><div class="mega-box"></div></div></div>
+      <div class="ni" data-mega="tech"><button class="nt" aria-expanded="false">Technology</button><div class="mega"><div class="mega-box"></div></div></div>
+      <div class="ni"><a class="nt" href="#engineering">Engineering</a></div>
+      <div class="ni"><a class="nt" href="#process">Why Dynamix</a></div>
+      <a class="btn btn-teal m-cta" href="#contact">Contact us</a>
+    </nav>
+    <div class="bar-cta">
+      <a class="btn btn-teal" href="#contact">Contact Us</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <canvas id="wave" aria-hidden="true"></canvas>
+    <div class="wrap hero-in">
+      <span class="kicker">Dynamics 365 · Power Platform · Microsoft 365 · Azure</span>
+      <h1>Bridge your business to the <b>Microsoft cloud.</b></h1>
+      <p class="sub">Plan, build and run on Dynamics 365, Power Platform and Azure with one accountable team.</p>
+      <p class="lead">We implement CRM and ERP, modernize your workplace with Microsoft 365 and Copilot, engineer multi-tenant .NET products, and keep everything running with managed services and on-demand specialists.</p>
+      <div class="hero-cta">
+        <a class="btn btn-teal" href="#contact">Book a call with experts <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12L12 4M6 4h6v6"/></svg></a>
+        <a class="btn btn-line" href="#services">Explore our services</a>
+      </div>
+    </div>
+    <div class="hero-foot"><div class="wrap hero-foot-in">
+      <p>One partner across CRM, ERP, the modern workplace, cloud and custom code.</p>
+      <div class="stack" id="stack"></div>
+    </div></div>
+  </section>
+
+  <section class="trust">
+    <svg class="ghost" viewBox="0 0 114 82" aria-hidden="true"><use href="#db-mark"/></svg>
+    <div class="wrap trust-grid">
+      <div><span class="kicker">A partner you can build on</span><h2 style="margin-top:18px">From first workshop to <b>steady state.</b></h2></div>
+      <div class="trust-copy">
+        <p>Dynamix Bridge is a Microsoft-focused software house. Our consultants configure, our developers write the plugins, integrations and APIs, and our support team keeps it all healthy after go-live.</p>
+        <p style="color:var(--muted);font-size:15.5px">Whether you need a full Dynamics 365 rollout, a Copilot-ready SharePoint, a SaaS platform on .NET, or two extra developers next week, you deal with one team that understands the whole stack.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span><div><b>5</b><span>Microsoft clouds: Dynamics 365, Power Platform, Microsoft 365, Azure, Fabric</span></div></div>
+        <div class="stat"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><div><b id="appCount">40</b><span>Microsoft products we implement and support</span></div></div>
+        <div class="stat"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></span><div><b>.NET</b><span>Multi-tenant SaaS and microservices engineering</span></div></div>
+        <div class="stat"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><b>24/7</b><span>Managed services and application support</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="svc" id="services">
+    <div class="giant" aria-hidden="true">Our Solutions</div>
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="kicker">The Microsoft umbrella</span><h2>Every app, every cloud, <b>one team.</b></h2></div>
+        <p>Pick a platform to see each product under its umbrella and how we deliver it, from first assessment to long-term support.</p>
+      </div>
+      <div class="svc-card">
+        <div class="stabs" role="tablist" aria-label="Microsoft platforms" id="stabs"></div>
+        <div id="spanels"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="eng" id="engineering">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="kicker">Custom engineering</span><h2>Software built for <b>scale.</b></h2></div>
+        <p>When off-the-shelf stops fitting, we build. Multi-tenant platforms, microservices and the web and mobile apps your customers use every day.</p>
+      </div>
+      <div class="eng-grid">
+        <article class="ecard"><div class="vis" data-art="0"></div><div class="body"><h3>Multi-tenant .NET applications</h3><p>One codebase serving every customer, with tenant isolation, onboarding, plans and usage billing designed in from the start.</p><ul><li>ASP.NET Core</li><li>Tenant isolation</li><li>Azure SQL</li><li>Entra ID</li></ul></div></article>
+        <article class="ecard"><div class="vis" data-art="1"></div><div class="body"><h3>Microservices architecture</h3><p>Domain services that deploy independently, talk through events, and scale on containers with full observability.</p><ul><li>AKS</li><li>Service Bus</li><li>gRPC &amp; REST</li><li>CI/CD</li></ul></div></article>
+        <article class="ecard"><div class="vis" data-art="2"></div><div class="body"><h3>Mobile &amp; web development</h3><p>Customer, partner and field apps that share identity and APIs with your Dynamics 365 and Azure back end.</p><ul><li>React</li><li>Angular</li><li>Flutter</li><li>.NET MAUI</li></ul></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="engage" id="engage">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="kicker">Ways to work with us</span><h2>Hand us the outcome, <b>or add us to your team.</b></h2></div>
+        <p>Managed services take responsibility for keeping systems running. Staff augmentation gives you skilled people under your direction. Many clients use both.</p>
+      </div>
+      <div class="models">
+        <div class="model"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span><h3>IT managed services</h3><p>We own the run: monitoring, tickets, patching and small enhancements against agreed SLAs, with a monthly report you can read in five minutes.</p><ul class="checks" id="chk-managed"></ul><a class="btn btn-dark" href="#contact">Discuss managed services</a></div>
+        <div class="model"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2c2.9.2 5 2.6 5 5.8"/></svg></span><h3>Staff augmentation</h3><p>Vetted Microsoft and .NET specialists join your stand-ups and your backlog, from a single expert to a dedicated pod with a lead and QA.</p><ul class="checks" id="chk-staff"></ul><a class="btn btn-dark" href="#contact">Request profiles</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process" id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="kicker">How we deliver</span><h2>Four stages, <b>no surprises.</b></h2></div>
+        <p>Every engagement follows the same path, sized to the project. A Power Apps build may move through it in weeks; an ERP rollout takes longer.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">01</span><h3>Discover</h3><p>Workshops with your users, a fit-gap against standard features, and a scoped plan with costs.</p></div>
+        <div class="step"><span class="n">02</span><h3>Design</h3><p>Solution architecture, data model, integrations and security roles, agreed before build.</p></div>
+        <div class="step"><span class="n">03</span><h3>Build</h3><p>Sprints with demos every two weeks, automated deployments and tested data migration.</p></div>
+        <div class="step"><span class="n">04</span><h3>Run</h3><p>Go-live support, training, then managed services or a clean handover to your team.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap"><div class="cband">
+      <svg class="art" aria-hidden="true" data-ribbon="3"></svg>
+      <div class="c-copy">
+        <span class="kicker">Get in touch</span>
+        <h2>Let's build your <b>bridge.</b></h2>
+        <p>Tell us what you're trying to connect. A 30-minute call is usually enough to tell whether Dynamics 365, Power Platform, custom development or a mix is the right fit.</p>
+        <ul class="c-list">
+          <li><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3 3 7-7"/></svg></i>No-obligation discovery call</li>
+          <li><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3 3 7-7"/></svg></i>Free Dynamics 365 health check</li>
+          <li><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3 3 7-7"/></svg></i>NDA available before we see your data</li>
+        </ul>
+      </div>
+      <form id="cform" novalidate>
+        <h3>Book a call with our experts</h3>
+        <div class="f"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name"></div>
+        <div class="f"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email"></div>
+        <div class="f"><label for="f-co">Company</label><input id="f-co" name="company" autocomplete="organization"></div>
+        <div class="f"><label for="f-svc">Interested in</label><select id="f-svc" name="service"></select></div>
+        <div class="f full"><label for="f-msg">What do you need?</label><textarea id="f-msg" name="message" placeholder="e.g. We run sales in spreadsheets and want Dynamics 365 Sales connected to Business Central."></textarea></div>
+        <div class="f-foot"><small>We only use your details to reply to this request.</small><button class="btn btn-teal" type="submit">Send request</button></div>
+        <div class="f-msg" id="fmsg" hidden></div>
+      </form>
+    </div></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fbrand">
+        <svg class="logo" viewBox="0 0 470 84" role="img" aria-label="Dynamix Bridge">
+          <use href="#db-mark" width="114" height="82"/>
+          <text x="128" y="47" font-family="Sora,'Segoe UI',sans-serif" font-weight="600" font-size="44" textLength="338" lengthAdjust="spacingAndGlyphs"><tspan class="w1">Dynamix</tspan><tspan class="w2" dx="10">Bridge</tspan></text>
+          <text class="tag" x="129" y="75" font-family="'Plus Jakarta Sans','Segoe UI',sans-serif" font-weight="500" font-size="18" textLength="300" lengthAdjust="spacingAndGlyphs">The bridge to smarter business.</text>
+        </svg>
+        <p>Microsoft business applications, cloud and custom engineering for companies that want their systems to work together.</p>
+      </div>
+      <div><h5>Dynamics 365</h5><ul id="ft-d365"></ul></div>
+      <div><h5>Microsoft &amp; cloud</h5><ul id="ft-cloud"></ul></div>
+      <div><h5>Offerings</h5><ul id="ft-svc"></ul></div>
+      <div><h5>Company</h5><ul><li><a href="#process">How we deliver</a></li><li><a href="#engage">Engagement models</a></li><li><a href="#engineering">Engineering</a></li><li><a href="#contact">Contact us</a></li></ul></div>
+    </div>
+    <div class="fbase"><span>© <span id="yr">2026</span> Dynamix Bridge. All rights reserved.</span><span>Microsoft, Dynamics 365, Microsoft 365 and Azure are trademarks of the Microsoft group of companies.</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+/* =====================================================================
+   PRODUCT ICONS
+   Product logos live in the "icons/" folder next to this page, named after
+   each item's `ic` key (source: github.com/loryanstrant/MicrosoftCloudLogos).
+   Items without an `ic` key show a neutral badge.
+   ===================================================================== */
+const USE_ICON_FILES=true, ICON_DIR='icons/';
+const PNG_ICONS=new Set(['microsoft-365','sharepoint','teams','m365-copilot','exchange','onedrive','intune','azure']);
+
+const L={
+ managed:'<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+ staff:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2c2.9.2 5 2.6 5 5.8"/>',
+ custom:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+ web:'<rect x="2" y="4" width="14" height="11" rx="1.5"/><rect x="15" y="8" width="7" height="12" rx="1.5"/><path d="M6 19h6"/>',
+ consult:'<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+ dot:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>'
+};
+const line=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+function icon(it){
+  if(it.svc) return `<span class="pi"><span class="mono svc">${line(L[it.svc]||L.dot)}</span></span>`;
+  if(USE_ICON_FILES&&it.ic) return `<span class="pi"><img src="${ICON_DIR}${it.ic}${PNG_ICONS.has(it.ic)?'.png':'.svg'}" alt="" loading="lazy"></span>`;
+  return `<span class="pi"><span class="mono${it.alt?' alt':''}">${it.ab}</span></span>`;
+}
+
+/* ================= TECHNOLOGY (Microsoft products) ================= */
+const TECH=[
+ {id:'d365',n:'Dynamics 365',ic:'dynamics-365',ab:'D',blurb:'Customer engagement (CRM) and finance & operations (ERP) apps on one platform.',groups:[
+  ['Overview',[{n:'Dynamics 365',ic:'dynamics-365',ab:'D',d:'Unify your business with a complete suite of business applications.'}]],
+  ['CRM apps',[
+   {n:'Sales',ic:'d365-sales',ab:'Sa',d:'Close more deals with pipeline insights and Copilot for sellers.'},
+   {n:'Customer Service',ic:'d365-customer-service',ab:'CS',d:'Resolve cases faster with knowledge, SLAs and omnichannel.'},
+   {n:'Field Service',ic:'d365-field-service',ab:'FS',d:'Schedule technicians and manage work orders on the go.'},
+   {n:'Customer Insights – Journeys',ic:'d365-customer-insights-journeys',ab:'CJ',d:'Orchestrate real-time customer journeys and events.'},
+   {n:'Customer Insights – Data',ic:'d365-customer-insights-data',ab:'CD',d:'Unify customer data into one profile you can act on.'},
+   {n:'Contact Center',ic:'d365-contact-center',ab:'CC',d:'Voice, chat and messaging with AI-powered agents.'}]],
+  ['ERP apps',[
+   {n:'Finance',ic:'d365-finance',ab:'Fi',d:'Automate financial operations, budgeting and consolidation.'},
+   {n:'Supply Chain Management',ic:'d365-supply-chain',ab:'SC',d:'Run inventory, warehousing, procurement and production.'},
+   {n:'Business Central',ic:'d365-business-central',ab:'BC',d:'All-in-one ERP for small and mid-sized businesses.'},
+   {n:'Project Operations',ic:'d365-project-operations',ab:'PO',d:'Quote, staff, deliver and bill projects in one place.'},
+   {n:'Commerce',ic:'d365-commerce',ab:'Co',d:'Unify point of sale, e-commerce and call center.'},
+   {n:'Human Resources',ic:'d365-human-resources',ab:'HR',d:'Manage people, leave, benefits and self-service.'}]]
+ ]},
+ {id:'power',n:'Power Platform',ic:'power-platform',ab:'PP',blurb:'Low-code apps, automation, portals, analytics and AI agents on Dataverse.',groups:[
+  ['',[
+   {n:'Power Platform',ic:'power-platform',ab:'PP',d:'Empower everyone to create apps, automate processes, and analyze data.'},
+   {n:'Power Automate',ic:'power-automate',ab:'PA',d:'Automate your workflows and save time.'},
+   {n:'Power Apps',ic:'power-apps',ab:'Ap',d:'Build custom apps without code.'},
+   {n:'AI Builder',ic:'ai-builder',ab:'AI',d:'Add AI to your apps and workflows.'},
+   {n:'Power Pages',ic:'power-pages',ab:'Pg',d:'Create secure, responsive websites without code.'},
+   {n:'Copilot Studio',ic:'copilot-studio',ab:'CS',d:'Build AI agents that act on your business data.'},
+   {n:'Power BI',ic:'power-bi',ab:'BI',d:'Turn data into interactive reports and insights.'},
+   {n:'Dataverse',ic:'dataverse',ab:'Dv',d:'Securely store and manage data for all your apps.'}]]
+ ]},
+ {id:'m365',n:'Microsoft 365',ic:'microsoft-365',ab:'M',blurb:'The modern workplace: content, collaboration, Copilot and security.',groups:[
+  ['',[
+   {n:'Microsoft 365',ic:'microsoft-365',ab:'M',d:'Productivity, collaboration and security in one cloud.'},
+   {n:'SharePoint',ic:'sharepoint',ab:'SP',d:'Build intranets and manage documents securely.'},
+   {n:'Microsoft Teams',ic:'teams',ab:'T',d:'Chat, meet, call and collaborate in one place.'},
+   {n:'Microsoft 365 Copilot',ic:'m365-copilot',ab:'Cp',d:'Your AI assistant across Word, Excel, Outlook and Teams.'},
+   {n:'Exchange Online',ic:'exchange',ab:'Ex',d:'Business-class email and calendars in the cloud.'},
+   {n:'OneDrive',ic:'onedrive',ab:'OD',d:'Store, share and sync files from anywhere.'},
+   {n:'Microsoft Viva',ic:'viva',ab:'Vi',d:'Engage employees with insights, learning and communication.'},
+   {n:'Microsoft Entra ID',ic:'entra-id',ab:'En',d:'Identity, single sign-on and conditional access.'},
+   {n:'Microsoft Intune',ic:'intune',ab:'In',d:'Manage and secure devices and apps.'},
+   {n:'Microsoft Purview',ic:'purview',ab:'Pv',d:'Protect, govern and stay compliant with your data.'}]]
+ ]},
+ {id:'azure',n:'Microsoft Azure',ic:'azure',ab:'Az',blurb:'Cloud infrastructure, integration, data and AI on Azure.',groups:[
+  ['',[
+   {n:'Microsoft Azure',ic:'azure',ab:'Az',d:'Build, run and manage applications across the cloud.'},
+   {n:'App Service',ic:'azure-app-service',ab:'AS',d:'Host web apps and APIs without managing servers.'},
+   {n:'Kubernetes Service (AKS)',ic:'azure-aks',ab:'K8',d:'Run containers and microservices at scale.'},
+   {n:'Azure Functions',ic:'azure-functions',ab:'Fn',d:'Run event-driven code that scales automatically.'},
+   {n:'Logic Apps',ic:'azure-logic-apps',ab:'LA',d:'Integrate apps, data and services with workflows.'},
+   {n:'Service Bus',ic:'azure-service-bus',ab:'SB',d:'Connect systems with reliable cloud messaging.'},
+   {n:'API Management',ic:'azure-api-management',ab:'AP',d:'Publish, secure and monitor your APIs.'},
+   {n:'Azure SQL Database',ic:'azure-sql',ab:'SQ',d:'Fully managed relational database in the cloud.'},
+   {n:'Azure Cosmos DB',ic:'azure-cosmos-db',ab:'Cx',d:'Globally distributed NoSQL database.'},
+   {n:'Microsoft Foundry',ic:'azure-openai',ab:'AI',d:'Build AI apps and agents with Azure OpenAI and other models.'},
+   {n:'Azure DevOps',ic:'azure-devops',ab:'DO',d:'Plan, build and ship with CI/CD pipelines.'}]]
+ ]},
+ {id:'fabric',n:'Microsoft Fabric',ic:'fabric',ab:'Fa',blurb:'Unified analytics: data engineering, warehousing and Power BI in one platform.',groups:[
+  ['',[
+   {n:'Microsoft Fabric',ic:'fabric',ab:'Fa',d:'One analytics platform from data lake to insight.'},
+   {n:'OneLake',ic:'onelake',ab:'OL',d:'A single data lake for your whole organization.'},
+   {n:'Data Factory',ic:'data-factory',ab:'DF',d:'Move and transform data with pipelines.'},
+   {n:'Data Warehouse',ic:'fabric-warehouse',ab:'DW',d:'Scalable SQL warehousing for analytics.'},
+   {n:'Power BI',ic:'power-bi',ab:'BI',d:'Visualize and share insights across the business.'}]]
+ ]}
+];
+/* ================= OFFERINGS (our services) ================= */
+const OFFER=[
+ {id:'managed',n:'IT Managed Services',svc:'managed',href:'#engage',blurb:'One accountable team keeps your applications, cloud and users running under clear SLAs.',groups:[['',[
+  {n:'Dynamics 365 Support (AMS)',svc:'managed',d:'Incidents, enhancements and release-wave readiness.'},
+  {n:'Power Platform CoE',svc:'managed',d:'Environments, DLP policies and governance.'},
+  {n:'Microsoft 365 Administration',svc:'managed',d:'Users, licenses, security and tenant health.'},
+  {n:'24/7 Monitoring',svc:'managed',d:'Alerts, on-call engineers and incident response.'},
+  {n:'Service Desk L1–L3',svc:'managed',d:'Friendly, fast support for your staff.'},
+  {n:'Backup & Disaster Recovery',svc:'managed',d:'Tested restores and documented runbooks.'}]]]},
+ {id:'staff',n:'Staff Augmentation',svc:'staff',href:'#engage',blurb:'Vetted specialists who join your team, your tools and your sprint schedule.',groups:[['',[
+  {n:'D365 Functional Consultants',svc:'staff',d:'CE and Finance & Operations experts.'},
+  {n:'D365 Technical Developers',svc:'staff',d:'Plugins, PCF controls, X++ and integrations.'},
+  {n:'Power Platform Developers',svc:'staff',d:'Apps, flows, Power Pages and Copilot Studio.'},
+  {n:'.NET & Azure Engineers',svc:'staff',d:'Backend, cloud and DevOps engineering.'},
+  {n:'Web & Mobile Developers',svc:'staff',d:'React, Angular, Flutter and React Native.'},
+  {n:'QA & Business Analysts',svc:'staff',d:'Requirements, testing and UAT support.'}]]]},
+ {id:'custom',n:'Custom Development',svc:'custom',href:'#engineering',blurb:'Multi-tenant .NET platforms and microservices built for many customers on one codebase.',groups:[['',[
+  {n:'Multi-tenant SaaS on .NET',svc:'custom',d:'Tenant isolation, onboarding, plans and billing.'},
+  {n:'Microservices Architecture',svc:'custom',d:'Domain services with event-driven messaging.'},
+  {n:'APIs & Integrations',svc:'custom',d:'REST, gRPC and Dynamics 365 / ERP connectors.'},
+  {n:'Legacy Modernization',svc:'custom',d:'Move .NET Framework apps to modern .NET and Azure.'},
+  {n:'DevOps & CI/CD',svc:'custom',d:'Pipelines, automated testing and observability.'}]]]},
+ {id:'web',n:'Mobile & Web Development',svc:'web',href:'#engineering',blurb:'Apps your customers and field teams use every day, connected to your back office.',groups:[['',[
+  {n:'Web Applications',svc:'web',d:'React, Next.js, Angular and Blazor.'},
+  {n:'Cross-platform Mobile Apps',svc:'web',d:'Flutter, React Native and .NET MAUI.'},
+  {n:'Customer & Partner Portals',svc:'web',d:'Self-service experiences on your data.'},
+  {n:'UI/UX Design',svc:'web',d:'Research, prototypes and design systems.'},
+  {n:'Progressive Web Apps',svc:'web',d:'Offline-ready and installable web apps.'}]]]},
+ {id:'consult',n:'Consulting Services',svc:'consult',href:'#process',blurb:'Expert guidance and fixed-scope packages for every stage of your Microsoft journey.',groups:[['',[
+  {n:'Implementation Services',svc:'consult',d:'Guided rollouts on a proven delivery framework.'},
+  {n:'Migration Services',svc:'consult',d:'On-premises to cloud and tenant-to-tenant moves.'},
+  {n:'Free Assessment',svc:'consult',d:'A no-cost health check of your current setup.'},
+  {n:'Training Services',svc:'consult',d:'Role-based training that drives adoption.'},
+  {n:'Fixed Scope & Price Packages',svc:'consult',d:'Clear deliverables at a known cost.'}]]]}
+];
+
+const all=f=>f.groups.flatMap(g=>g[1]);
+const tabHref=(f,menu)=>menu==='tech'?'#services':f.href;
+
+/* Right column: "X in Action" + "Work With Us" */
+function action(p,f,menu){
+  const href=tabHref(f,menu), tab=menu==='tech'?f.id:'';
+  const A = menu==='tech' ? [
+    [`What is ${p.n}?`,`Learn how ${p.n} can help your business. ${p.d}`],
+    [`${p.n} Use Cases & Benefits`,`Discover how organizations use ${p.n} to work faster and smarter.`]
+  ] : [
+    [`What's included?`,p.d],
+    [`How we deliver it`,`A clear scope, a named lead and regular progress reviews.`]
+  ];
+  const W = menu==='tech' ? [
+    [`${p.n} Consultancy`,`Let our team of experts help you get the most out of ${p.n}.`],
+    [`${p.n} Support`,`SLA-backed support and enhancements after go-live.`]
+  ] : [
+    [`Talk to an expert`,`Tell us what you need and get a tailored proposal.`],
+    [`Book a free assessment`,`A no-cost review of where you are and what to do next.`]
+  ];
+  const lnk=(x,h)=>`<a href="${h}" data-tab="${tab}"><strong>${x[0]}</strong><span>${x[1]}</span></a>`;
+  return `<h4>${p.n} in Action</h4><div class="arts">${A.map(x=>lnk(x,href)).join('')}</div><h4>Work With Us</h4><div class="arts">${W.map(x=>lnk(x,'#contact')).join('')}</div>`;
+}
+
+document.querySelectorAll('.ni[data-mega]').forEach(ni=>{
+  const menu=ni.dataset.mega, list=menu==='tech'?TECH:OFFER, box=ni.querySelector('.mega-box');
+  box.innerHTML=`<div class="fam" role="tablist">${list.map((f,i)=>`<button type="button" role="tab" aria-selected="${i===0}" data-i="${i}">${icon(f)}<span>${f.n}</span><span class="tri"></span></button>`).join('')}</div><div class="prod"></div><div class="act"></div>
+   <div class="mob">${list.map(f=>`<details><summary>${icon(f)}${f.n}</summary><ul>${all(f).map(p=>`<li><a href="${tabHref(f,menu)}" data-tab="${menu==='tech'?f.id:''}">${icon(p)}${p.n}</a></li>`).join('')}</ul></details>`).join('')}</div>`;
+  const prod=box.querySelector('.prod'), act=box.querySelector('.act');
+  function showFam(i){
+    const f=list[i];
+    box.querySelectorAll('.fam button').forEach(b=>b.setAttribute('aria-selected',+b.dataset.i===i));
+    let k=0;
+    prod.innerHTML=f.groups.map(([g,items])=>(g&&g!=='Overview'?`<div class="grp">${g}</div>`:'')+items.map(p=>`<a href="${tabHref(f,menu)}" data-tab="${menu==='tech'?f.id:''}" data-k="${k++}">${icon(p)}<span class="txt"><strong>${p.n}</strong><span class="d">${p.d}</span></span><span class="tri"></span></a>`).join('')).join('');
+    prod.scrollTop=0;
+    const items=all(f);
+    const showProd=j=>{prod.querySelectorAll('a').forEach(a=>a.classList.toggle('on',+a.dataset.k===j));act.innerHTML=action(items[j],f,menu);};
+    prod.querySelectorAll('a').forEach(a=>{a.addEventListener('mouseenter',()=>showProd(+a.dataset.k));a.addEventListener('focus',()=>showProd(+a.dataset.k));});
+    showProd(0);
+  }
+  box.querySelectorAll('.fam button').forEach(b=>{const go=()=>showFam(+b.dataset.i);b.addEventListener('mouseenter',go);b.addEventListener('focus',go);b.addEventListener('click',go);});
+  showFam(0);
+});
+
+/* ================= SERVICES TABS ================= */
+const DELIVER=[
+ ['Implementation','Workshops, fit-gap, configuration and go-live on a proven delivery framework, with data migration tested before cut-over.'],
+ ['Migration & upgrades','Move from on-premises, legacy systems or another tenant with a rehearsed plan and a predictable cut-over.'],
+ ['Customization & integration','Plugins, custom APIs, PCF controls, Azure Functions and connectors that are source-controlled and supportable.'],
+ ['Managed support','SLA-backed support, enhancements and release-wave readiness after go-live.'],
+ ['Staff augmentation','Add certified consultants or developers to your own team, by the month.'],
+ ['Free assessment','A no-cost review of your current setup with prioritized recommendations.']
+];
+const stabs=document.getElementById('stabs'),spanels=document.getElementById('spanels');
+stabs.innerHTML=TECH.map((f,i)=>`<button class="stab" role="tab" id="st-${f.id}" aria-controls="sp-${f.id}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" data-k="${f.id}">${icon(f)}${f.n}</button>`).join('');
+spanels.innerHTML=TECH.map((f,i)=>`<div class="spanel" role="tabpanel" id="sp-${f.id}" aria-labelledby="st-${f.id}" ${i?'hidden':''}>
+  <div class="spanel-l"><h3>${f.n}</h3><p>${f.blurb}</p><div class="acc">${DELIVER.map((d,j)=>`<details ${j===0?'open':''}><summary>${d[0]}<span class="pm"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 1v8M1 5h8"/></svg></span></summary><p>${d[1]}</p></details>`).join('')}</div></div>
+  <div class="spanel-r"><h4>Under the ${f.n} umbrella</h4><div class="apps">${all(f).slice(1).map(p=>`<div class="app">${icon(p)}<div><strong>${p.n}</strong><span>${p.d}</span></div></div>`).join('')}</div></div></div>`).join('');
+const tabs=[...stabs.querySelectorAll('.stab')];
+function selectTab(k){if(!k)return;tabs.forEach(t=>{const on=t.dataset.k===k;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;document.getElementById('sp-'+t.dataset.k).hidden=!on;});}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>selectTab(t.dataset.k));t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=tabs[(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];selectTab(n.dataset.k);n.focus();}});});
+
+/* Hero stack, checklists, form, footer */
+const pp=all(TECH[1]), mm=all(TECH[2]);
+document.getElementById('stack').innerHTML=[TECH[0],pp[2],pp[1],pp[6],mm[1],mm[2],mm[3],TECH[3]].map(p=>`<span class="tile">${icon(p)}${p.n.replace('Microsoft ','')}</span>`).join('')+`<span class="tile">${icon({ab:'.N',alt:1})}.NET</span>`;
+const ck=t=>`<li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3 3 7-7"/></svg>${t}</li>`;
+document.getElementById('chk-managed').innerHTML=all(OFFER[0]).map(p=>ck(p.n)).join('');
+document.getElementById('chk-staff').innerHTML=all(OFFER[1]).map(p=>ck(p.n)).join('');
+document.getElementById('f-svc').innerHTML=[...TECH,...OFFER].map(f=>`<option>${f.n}</option>`).join('');
+document.getElementById('ft-d365').innerHTML=[...TECH[0].groups[1][1].slice(0,3),...TECH[0].groups[2][1].slice(0,3)].map(p=>`<li><a href="#services" data-tab="d365">${p.n}</a></li>`).join('');
+document.getElementById('ft-cloud').innerHTML=TECH.slice(1).map(f=>`<li><a href="#services" data-tab="${f.id}">${f.n}</a></li>`).join('');
+document.getElementById('ft-svc').innerHTML=OFFER.map(f=>`<li><a href="${f.href}">${f.n}</a></li>`).join('');
+document.getElementById('appCount').textContent=new Set(TECH.flatMap(all).map(p=>p.n)).size;
+document.getElementById('yr').textContent=new Date().getFullYear();
+
+/* Ribbon art for the contact band */
+document.querySelectorAll('[data-ribbon]').forEach(el=>{
+  const W=600,H=400;let o='';
+  for(let i=0;i<46;i++){const t=i/46,k=5.1;
+    o+=`<path d="M-20 ${(H*.95-t*60).toFixed(1)} C ${(150+Math.sin(t*3+k)*60).toFixed(1)} ${(20+t*120).toFixed(1)}, ${(420+Math.cos(t*2+k)*80).toFixed(1)} ${(60+t*90).toFixed(1)}, ${W+20} ${(H*.75-t*140).toFixed(1)}" fill="none" stroke="url(#rib)" stroke-width="1.3" opacity="${(.25+.75*Math.sin(Math.PI*t)).toFixed(2)}"/>`;}
+  el.setAttribute('viewBox',`0 0 ${W} ${H}`);el.innerHTML=o;
+});
+
+/* Engineering card visuals (teal on dark) */
+const ART=[
+ ()=>{let s='';for(let i=0;i<5;i++){s+=`<g transform="translate(200 ${150-i*24})"><path d="M0 -26 L90 0 L0 26 L-90 0Z" fill="${i===4?'#0BA89F':'rgba(43,196,185,'+(.1+i*.08)+')'}" stroke="#2BC4B9"/></g>`}for(let i=0;i<3;i++){s+=`<circle cx="${110+i*90}" cy="36" r="5" fill="none" stroke="#2BC4B9" stroke-width="2"/><path d="M${110+i*90} 41 V66" stroke="#2BC4B9" stroke-width="1.5" stroke-dasharray="3 3"/>`}return s;},
+ ()=>{const P=[[80,60],[200,40],[320,70],[60,160],[200,120],[330,170],[140,195],[260,200]],E=[[0,4],[1,4],[2,4],[3,4],[5,4],[6,4],[7,4],[0,1],[1,2],[3,6],[5,7],[6,7]];let s='';E.forEach(([a,b])=>s+=`<line x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}" stroke="rgba(43,196,185,.45)" stroke-width="1.3"/>`);P.forEach((p,i)=>s+=i===4?`<circle cx="${p[0]}" cy="${p[1]}" r="22" fill="#0BA89F"/><circle cx="${p[0]}" cy="${p[1]}" r="34" fill="none" stroke="#2BC4B9" stroke-opacity=".4"/>`:`<rect x="${p[0]-14}" y="${p[1]-14}" width="28" height="28" rx="7" fill="#FFFFFF" stroke="#0BA89F" stroke-width="1.5"/>`);return s;},
+ ()=>`<rect x="70" y="40" width="220" height="140" rx="10" fill="#FFFFFF" stroke="#0BA89F" stroke-width="1.5"/><rect x="70" y="40" width="220" height="22" rx="10" fill="rgba(43,196,185,.18)"/><circle cx="86" cy="51" r="3.5" fill="#2BC4B9"/><rect x="88" y="78" width="90" height="10" rx="5" fill="#2BC4B9"/><rect x="88" y="96" width="140" height="6" rx="3" fill="#CFE3E1"/><rect x="88" y="108" width="110" height="6" rx="3" fill="#E0ECEB"/><rect x="88" y="128" width="60" height="34" rx="6" fill="rgba(43,196,185,.25)"/><rect x="156" y="128" width="60" height="34" rx="6" fill="rgba(43,196,185,.15)"/><rect x="270" y="80" width="78" height="140" rx="14" fill="#FFFFFF" stroke="#0BA89F" stroke-width="2"/><rect x="282" y="100" width="54" height="8" rx="4" fill="#0BA89F"/><rect x="282" y="116" width="40" height="5" rx="2.5" fill="#CFE3E1"/><rect x="282" y="132" width="54" height="40" rx="6" fill="rgba(43,196,185,.2)"/><rect x="282" y="180" width="54" height="22" rx="11" fill="#0BA89F"/>`
+];
+document.querySelectorAll('.vis[data-art]').forEach(v=>{const i=+v.dataset.art;v.innerHTML=`<svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="vg${i}" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E3F5F3"/></radialGradient></defs><rect width="400" height="230" fill="url(#vg${i})"/>${ART[i]()}</svg>`;});
+
+/* ================= NAV BEHAVIOUR ================= */
+const nav=document.getElementById('nav'),burger=document.getElementById('burger'),hdr=document.getElementById('hdr');
+const mobile=()=>matchMedia('(max-width:1060px)').matches;
+burger.addEventListener('click',()=>{nav.style.top=hdr.getBoundingClientRect().bottom+'px';const s=nav.classList.toggle('show');document.body.style.overflow=s?'hidden':'';burger.setAttribute('aria-expanded',s);burger.setAttribute('aria-label',s?'Close menu':'Open menu');});
+document.querySelectorAll('.ni[data-mega]').forEach(ni=>{
+  const b=ni.querySelector('.nt');
+  b.addEventListener('click',()=>{const o=!ni.classList.contains('open');document.querySelectorAll('.ni.open').forEach(x=>{if(x!==ni){x.classList.remove('open');x.querySelector('.nt').setAttribute('aria-expanded','false')}});ni.classList.toggle('open',o);ni.classList.remove('shut');b.setAttribute('aria-expanded',o);});
+  ni.addEventListener('mouseleave',()=>{if(!mobile()){ni.classList.remove('open','shut');b.setAttribute('aria-expanded','false');}});
+});
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');
+  if(a){
+    selectTab(a.dataset.tab);
+    const ni=a.closest('.ni');
+    if(ni&&!mobile()){ni.classList.remove('open');ni.classList.add('shut');a.blur();}
+    if(mobile()&&a.closest('#nav')){nav.classList.remove('show');document.body.style.overflow='';burger.setAttribute('aria-expanded','false');document.querySelectorAll('.ni.open').forEach(x=>x.classList.remove('open'));}
+  }
+  if(!mobile()&&!e.target.closest('.ni')) document.querySelectorAll('.ni.open').forEach(x=>x.classList.remove('open'));
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.ni.open').forEach(x=>x.classList.remove('open'));});
+addEventListener('scroll',()=>hdr.classList.toggle('scrolled',scrollY>40),{passive:true});
+
+/* ================= HERO DOT WAVE ================= */
+const cv=document.getElementById('wave'),ctx=cv.getContext('2d');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W,H,t=0,raf,visible=true;
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);}
+function frame(){
+  ctx.clearRect(0,0,W,H);
+  const cols=W<700?60:110,rows=34,f=W*0.9,hz=H*0.4;
+  for(let r=0;r<rows;r++){const z=1+r*0.14;
+    for(let c=0;c<cols;c++){const x=(c/(cols-1)-0.5)*7;
+      const y=Math.sin(x*0.9+t)*0.32+Math.cos(z*1.3-t*0.8)*0.28+Math.sin((x+z)*0.6+t*0.5)*0.22;
+      const sx=W*0.62+(x*f)/(z*3.2),sy=hz+((1.15-y)*f*0.5)/(z*3.2)+H*0.1;
+      if(sx<-10||sx>W+10||sy<0||sy>H)continue;
+      const a=Math.max(0,1-r/rows)*(0.35+0.65*((y+0.8)/1.6)),s=Math.max(0.6,2.4/z);
+      ctx.fillStyle=y>0.2?`rgba(11,168,159,${(a*0.9).toFixed(3)})`:`rgba(11,168,159,${(a*0.35).toFixed(3)})`;
+      ctx.fillRect(sx,sy,s,s);}}
+}
+function loop(){t+=0.012;frame();if(visible)raf=requestAnimationFrame(loop);}
+size();frame();addEventListener('resize',()=>{size();frame();});
+if(!reduce)new IntersectionObserver(es=>{visible=es[0].isIntersecting;cancelAnimationFrame(raf);if(visible)loop();}).observe(cv);
+
+/* ================= FORM ================= */
+const form=document.getElementById('cform'),msg=document.getElementById('fmsg');
+form.addEventListener('submit',e=>{
+  e.preventDefault();form.querySelectorAll('.err').forEach(x=>x.remove());
+  let ok=true;const n=form.elements.name,em=form.elements.email;
+  if(!n.value.trim()){ok=false;n.insertAdjacentHTML('afterend','<span class="err">Enter your name so we know who to reply to.</span>');}
+  if(!/^\S+@\S+\.\S+$/.test(em.value.trim())){ok=false;em.insertAdjacentHTML('afterend','<span class="err">Enter a valid work email, like name@company.com.</span>');}
+  if(!ok)return;
+  msg.hidden=false;msg.textContent=`Thanks, ${n.value.trim().split(' ')[0]}. Your ${form.elements.service.value} request is ready. This preview isn't connected to an inbox yet, so nothing has been sent.`;
+});
+})();
+</script>
+
+</body></html>
