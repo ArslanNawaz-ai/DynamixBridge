@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /_build/
+Sitemap: https://arslannawaz-ai.github.io/DynamixBridge/sitemap.xml
